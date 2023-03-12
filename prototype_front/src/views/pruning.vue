@@ -8,7 +8,7 @@
           </div>
           <div>
             <el-button type="primary" :loading="loading" @click="loadData">开始剪枝</el-button>
-            <el-button type="primary" icon="el-icon-download" :disabled="downloadable" @click="downloadModel">下载模型</el-button>
+            <el-button type="primary" icon="el-icon-download" :disabled="!downloadable" @click="downloadModel">下载模型</el-button>
           </div>
           <div class="metric-item" v-for="(value, key) in metrics" :key="key">
             <div class="metric-name">{{ key }}</div>

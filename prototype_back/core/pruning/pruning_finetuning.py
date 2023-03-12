@@ -15,7 +15,7 @@ def pruning_finetuning(pruned_state, trainloader, testloader):
     params = [
         {'params': net.parameters()}
     ]
-    Epoch = 2
+    Epoch = 200
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params, lr=0.1,
                                 momentum=0.9, weight_decay=1e-4)
