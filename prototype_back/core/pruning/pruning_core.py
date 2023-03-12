@@ -23,9 +23,9 @@ def get_dataloader(selectedTask):
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
-        trainset = torchvision.datasets.CIFAR10(root='./core/pruning/datasets/cifar10/', train=True, download=False,
+        trainset = torchvision.datasets.CIFAR10(root='./core/data/cifar10/', train=True, download=False,
                                                 transform=transform_train)
-        testset = torchvision.datasets.CIFAR10(root='./core/pruning/datasets/cifar10/', train=False, download=True,
+        testset = torchvision.datasets.CIFAR10(root='./core/data/cifar10/', train=False, download=True,
                                                transform=transform_test)
         train_sampler, val_sampler = TrainVal_split(trainset, 0.1, shuffle_dataset=True)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, num_workers=0, shuffle=True)
@@ -46,9 +46,9 @@ def get_dataloader(selectedTask):
                 transforms.ToTensor(),
                 transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
             ])
-            trainset = torchvision.datasets.CIFAR10(root='./datasets/svhn/', train=True, download=False,
+            trainset = torchvision.datasets.CIFAR10(root='./core/data/svhn/', train=True, download=False,
                                                 transform=transform_train)
-            testset = torchvision.datasets.CIFAR10(root='./datasets/svhn/', train=False, download=True,
+            testset = torchvision.datasets.CIFAR10(root='./core/data/svhn/', train=False, download=True,
                                                    transform=transform_test)
             train_sampler, val_sampler = TrainVal_split(trainset, 0.1, shuffle_dataset=True)
             trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, num_workers=0, shuffle=True)
@@ -61,12 +61,12 @@ def get_pruning(selectedTask):
     trainloader, validloader, testloader = get_dataloader(selectedTask)
     net = NiN_hyper(depth=HParams.model_depth, width=HParams.model_width, base_width=HParams.base_width,
                     dataset_type=HParams.dataset_type)
-    state_dict = torch.load('./core/pruning/checkpoint/nin-base.pth.tar')
+    state_dict = torch.load('./core/upload/model.tar')
     net.load_state_dict(state_dict['net'])
     pruning_state = pruning_pm(net, validloader, testloader)
     pruned_state = pruning_model(pruning_state)
     finetuing_state = pruning_finetuning(pruned_state, trainloader, testloader)
-    value = {'原始模型准确率（%）': state_dict['acc'], '剪枝率': pruned_state['pruning_rate'], '子模型准确率（%）': finetuing_state['acc']}
+    value = {'原始模型准确率（%）：': state_dict['acc'], '剪枝率：': pruned_state['pruning_rate'], '子模型准确率（%）：': finetuing_state['acc']}
     return value
 
 

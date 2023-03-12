@@ -176,7 +176,7 @@ def get_all_measures(model, init_model, dataloader,
     return torch.cat(margins).kthvalue(m // 10)[0]
 
   margin = _margin(model, dataloader).abs()
-  measures['1/margin'] = torch.tensor(1, device=device) / margin ** 2 # 22  -----保留----
+  measures['1/margin：'] = torch.tensor(1, device=device) / margin ** 2 # 22  -----保留----
 
   # Norm & Margin-Based Measures
   fro_norms = torch.cat([p.norm('fro').unsqueeze(0) ** 2 for p in reshaped_weights])
@@ -186,25 +186,25 @@ def get_all_measures(model, init_model, dataloader,
   LOG_PROD_OF_SPEC = spec_norms.log().sum()
   LOG_PROD_OF_FRO = fro_norms.log().sum()
 
-  measures['sum_spectral/margin'] = math.log(d) + (1/d) * (LOG_PROD_OF_SPEC -  2 * margin.log()) # ----保留----
-  measures['sum_spectral'] = math.log(d) + (1/d) * LOG_PROD_OF_SPEC # 35  ----保留----
-  measures['sum_frobenius'] = math.log(d) + (1/d) * LOG_PROD_OF_FRO # 39  ----保留----
-  measures['frobenius_initial'] = dist_fro_norms.sum() # 40 ----保留----
+  measures['sum_spectral/margin：'] = math.log(d) + (1/d) * (LOG_PROD_OF_SPEC -  2 * margin.log()) # ----保留----
+  measures['sum_spectral：'] = math.log(d) + (1/d) * LOG_PROD_OF_SPEC # 35  ----保留----
+  measures['sum_frobenius：'] = math.log(d) + (1/d) * LOG_PROD_OF_FRO # 39  ----保留----
+  measures['frobenius_initial：'] = dist_fro_norms.sum() # 40 ----保留----
 
 
 
-  # # Flatness-based measures
-  # sigma = _pacbayes_sigma(model, dataloader, acc, seed)
-  # def _pacbayes_bound(reference_vec: Tensor) -> Tensor:
-  #   return (reference_vec.norm(p=2) ** 2) / (4 * sigma ** 2) + math.log(m / sigma) + 10
-  # measures['pacbayes_initial'] = _pacbayes_bound(dist_w_vec)
-  # measures['pacbayes_origin'] = _pacbayes_bound(w_vec)
-  # measures['sharpness'] = torch.tensor(1 / sigma ** 2)
+  # Flatness-based measures
+  sigma = _pacbayes_sigma(model, dataloader, acc, seed)
+  def _pacbayes_bound(reference_vec: Tensor) -> Tensor:
+    return (reference_vec.norm(p=2) ** 2) / (4 * sigma ** 2) + math.log(m / sigma) + 10
+  measures['pacbayes_initial：'] = _pacbayes_bound(dist_w_vec)
+  measures['pacbayes_origin：'] = _pacbayes_bound(w_vec)
+  measures['sharpness：'] = torch.tensor(1 / sigma ** 2)
 
 
   # Adjust for dataset size
   def adjust_measure(measure: str, value: float) -> float:
-    if measure == 'sum_spectral/margin' or measure == 'sum_spectral' or measure == 'sum_frobenius':
+    if measure == 'sum_spectral/margin：' or measure == 'sum_spectral：' or measure == 'sum_frobenius：':
       return 0.5 * (value - np.log(m))
     else:
       return np.sqrt(value / m)

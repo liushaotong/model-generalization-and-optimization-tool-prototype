@@ -22,7 +22,7 @@ def pruning_pm(net, validloader, testloader):
     resource_reg = Flops_constraint_nin(0.5, size_kernel, size_out, size_group, size_inchannel, size_outchannel,
                                         HN=True, structure=structure)
     criterion = nn.CrossEntropyLoss()
-    Epoch = 200
+    Epoch = 2
     epm_flag = True
     nf = 3.0
     orth_grad = True

@@ -8,6 +8,7 @@
           </div>
           <div>
             <el-button type="primary" :loading="loading" @click="loadData">开始剪枝</el-button>
+            <el-button type="primary" icon="el-icon-download" :disabled="downloadable" @click="downloadModel">下载模型</el-button>
           </div>
           <div class="metric-item" v-for="(value, key) in metrics" :key="key">
             <div class="metric-name">{{ key }}</div>
@@ -23,14 +24,16 @@ export default {
   data() {
     return {
       metrics: {},
-      loading: false
+      loading: false,
+      downloadable: false,
+      downloadUrl: "model.tar" // 修改为你想要下载的模型文件路径
     };
   },
   methods: {
     loadData() {
       this.loading = true;
-      this.metrics = {}
-      let dict = {}
+      this.metrics = {};
+      let dict = {};
       const selectedTask = sessionStorage.getItem('selectedTask');
       dict['selectedTask'] = selectedTask;
       this.$http.post('http://localhost:5000/pruning', dict)
@@ -38,6 +41,7 @@ export default {
           this.metrics = response.data;
           // 保存数据到 session
           sessionStorage.setItem('pruningMetrics', JSON.stringify(this.metrics));
+          this.downloadable = true;
         })
         .catch(error => {
           console.log(error);
@@ -51,7 +55,33 @@ export default {
       const metrics = sessionStorage.getItem('pruningMetrics');
       if (metrics) {
         this.metrics = JSON.parse(metrics);
+        this.downloadable = true;
       }
+    },
+    downloadModel() {
+      // window.open(this.downloadUrl);
+  //     const link = document.createElement('a');
+  // link.href = this.downloadUrl;
+  // link.download = this.downloadUrl.substr(this.downloadUrl.lastIndexOf('/') + 1);
+  // link.setAttribute('target', '_blank');
+  // link.setAttribute('rel', 'noopener noreferrer');
+  // link.setAttribute('type', 'application/octet-stream');
+  // document.body.appendChild(link);
+  // link.click();
+  // document.body.removeChild(link);
+  this.$http({
+    url: 'http://localhost:5000/download',
+    method: 'GET',
+    responseType: 'blob',
+  }).then(response => {
+    const url = URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = this.downloadUrl;
+    link.click();
+  }).catch(error => {
+    console.log(error);
+  });
     }
   },
   created() {
@@ -93,3 +123,7 @@ export default {
   color: #606266;
 }
 </style>
+
+
+
+

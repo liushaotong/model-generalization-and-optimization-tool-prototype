@@ -221,7 +221,7 @@ def valid(epoch, net, testloader, best_acc, best_state, hyper_net=None, stage='v
     acc = 100. * correct / total
     is_best = False
     if hyper_net is not None:
-        if epoch > 100:
+        if epoch < 100:
             if acc > best_acc:
                 best_acc = acc
                 is_best = True

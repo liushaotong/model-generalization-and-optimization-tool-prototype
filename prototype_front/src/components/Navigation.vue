@@ -37,8 +37,31 @@ export default {
     }
   },
   methods: {
-    beforeUpload() {
+    beforeUpload(file) {
+      const allowedFormats = ['pt', 'pth', 'tar'];
+      const extension = file.name.split('.').pop();
+      const allowed = allowedFormats.includes(extension.toLowerCase());
+      if (!allowed) {
+        this.$message.error('只能上传 .pt, .pth, .tar 格式的文件');
+        return false;
+      }
       // 在这里添加模型上传的业务逻辑
+      let formData = new FormData()
+      formData.append('file', file)
+
+      // 发送上传请求
+      this.$http.post('http://localhost:5000/upload', formData)
+        .then(response => {
+      console.log(response.data)
+      // 上传成功，显示提示消息
+      this.$message.success('模型上传成功！');
+      })
+      .catch(error => {
+        console.log(error)
+      })
+
+  // 阻止文件上传
+      return false
     },
     saveTask() {
       switch (this.selectedTask) {
